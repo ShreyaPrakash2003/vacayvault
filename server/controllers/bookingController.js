@@ -1,7 +1,8 @@
 import Booking from "../models/Booking.js";
 import Hotel from "../models/Hotel.js";
 import Room from "../models/Room.js";
-import transporter from "../configs/nodemailer.js";
+import sendMail from "../utils/sendmail.js";
+// import transporter from "../configs/nodemailer.js";
 
 // Helper: Check room availability
 const checkAvailability = async ({ checkInDate, checkOutDate, room }) => {
@@ -60,29 +61,40 @@ export const createBooking = async (req, res) => {
       checkOutDate,
       totalPrice,
     });
-   
-    // Send confirmation email
-    const mailOptions = {
-      from: process.env.SENDER_EMAIL,
-      to: req.user.email,
-      subject: 'Hotel Booking Confirmation',
-      html: `
-        <h2>Your Booking is Confirmed!</h2>
-        <p>Hello ${req.user.username},</p>
-        <p>Thank you for your booking. Here are the details:</p>
-        <ul>
-          <li><strong>Booking ID:</strong> ${booking.id}</li>
-          <li><strong>Hotel:</strong> ${roomData.hotel.name}</li>
-          <li><strong>Address:</strong> ${roomData.hotel.address}</li>
-          <li><strong>Check-in:</strong> ${checkIn.toDateString()}</li>
-          <li><strong>Check-out:</strong> ${checkOut.toDateString()}</li>
-          <li><strong>Total Price:</strong> ₹${totalPrice}</li>
-        </ul>
-        <p>We look forward to hosting you!</p>
-      `,
+   // Send confirmation email
+    const emailData = {
+      username: req.user.username,
+      bookingId: booking.id,
+      hotelName: roomData.hotel.name,
+      hotelAddress: roomData.hotel.address,
+      checkIn: checkIn.toDateString(),
+      checkOut: checkOut.toDateString(),
+      totalPrice,
     };
 
-    await transporter.sendMail(mailOptions);
+    await sendMail(req.user.email, "Hotel Booking Confirmation", emailData);
+    // Send confirmation email
+    // const mailOptions = {
+    //   from: process.env.SENDER_EMAIL,
+    //   to: req.user.email,
+    //   subject: 'Hotel Booking Confirmation',
+    //   html: `
+    //     <h2>Your Booking is Confirmed!</h2>
+    //     <p>Hello ${req.user.username},</p>
+    //     <p>Thank you for your booking. Here are the details:</p>
+    //     <ul>
+    //       <li><strong>Booking ID:</strong> ${booking.id}</li>
+    //       <li><strong>Hotel:</strong> ${roomData.hotel.name}</li>
+    //       <li><strong>Address:</strong> ${roomData.hotel.address}</li>
+    //       <li><strong>Check-in:</strong> ${checkIn.toDateString()}</li>
+    //       <li><strong>Check-out:</strong> ${checkOut.toDateString()}</li>
+    //       <li><strong>Total Price:</strong> ₹${totalPrice}</li>
+    //     </ul>
+    //     <p>We look forward to hosting you!</p>
+    //   `,
+    // };
+
+    // await transporter.sendMail(mailOptions);
 
     res.json({ success: true, message: "Booking created successfully" });
 

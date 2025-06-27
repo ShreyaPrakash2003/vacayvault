@@ -12,6 +12,9 @@ import RoomDetails from './pages/RoomDetails'
 import Footer from './components/Footer'
 import MyBookings from './pages/MyBookings'
 import Loader from './components/Loader'
+import RegisterForm from './pages/Register'
+import LoginForm from './pages/Login'
+
 
 const App = () => {
   const [showHotelReg, setShowHotelReg] = useState(false);
@@ -31,12 +34,15 @@ const App = () => {
         <Routes>
           <Route path='/' element={<Home />} />
           <Route path='/rooms' element={<AllRooms />} />
+          <Route path='/register' element={<RegisterForm />} />
+          <Route path='/login' element={<LoginForm />} />
           <Route path='/rooms/:id' element={<RoomDetails />} />
           <Route path='/my-bookings' element={<MyBookings />} />
           <Route path="/loader/:nextUrl" element={<Loader />} />
           <Route path="/owner" element={<Layout />}>
             <Route index element={<Dashboard />} />
             <Route path="add-room" element={<AddRoom />} />
+             <Route path="add-hotel" element={<HotelReg/>} />
             <Route path="list-room" element={<ListRoom />} />
           </Route>
         </Routes>

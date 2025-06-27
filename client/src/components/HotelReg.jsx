@@ -1,67 +1,124 @@
-import React from "react";
-import { assets, cities } from "../assets/assets";
+import React, { useState } from 'react'
+import { cities } from '../assets/assets'
+import Title from '../components/Title'
+import toast from 'react-hot-toast'
+import axios from 'axios'
 
-const HotelReg = () => {
+const AddHotel = () => {
+  const [loading, setLoading] = useState(false)
+  const [inputs, setInputs] = useState({
+    name: '',
+     contact: '',
+    address: '',
+    city: ''
+  })
+
+  const onSubmitHandler = async (e) => {
+    e.preventDefault()
+    const { name, contact, address, city } = inputs
+
+    if (!name || !contact || !address || !city) {
+      toast.error('Please fill in all fields')
+      return
+    }
+
+    setLoading(true)
+    try {
+      const token = localStorage.getItem('token')
+      console.log(inputs)
+      const { data } = await axios.post(
+        `${import.meta.env.VITE_BACKEND_URL}/api/hotels/register`,
+        inputs,
+        {
+          headers: { Authorization: `Bearer ${token}` }
+        }
+      )
+
+      if (data.success) {
+        toast.success(data.message)
+        setInputs({ name: '',  contact: '', address: '', city: '' })
+      } else {
+        toast.error(data.message)
+      }
+    } catch (error) {
+      toast.error(error.message)
+    } finally {
+      setLoading(false)
+    }
+  }
+
   return (
-    <div className="fixed top-0 bottom-0 left-0 right-0 z-50 flex items-center justify-center bg-black/70">
-      <form className="flex bg-white rounded-xl max-w-4xl max-md:mx-2">
-        <img src={assets.regImage} alt="reg-image" className="w-1/2 rounded-xl hidden md:block" />
-        <div className="relative flex flex-col items-center md:w-1/2 p-8 md:p-10">
-          <img
-            src={assets.closeIcon}
-            alt="close-icon"
-            className="absolute top-4 right-4 h-4 w-4 cursor-pointer"
+    <form onSubmit={onSubmitHandler}>
+      <Title
+        align='left'
+        font='outfit'
+        title='Register Your Hotel'
+        subTitle='Provide your hotel’s details to get it listed on the platform.'
+      />
+
+      <div className='w-full flex max-sm:flex-col sm:gap-4 mt-4'>
+        <div className='flex-1 max-w-sm'>
+          <p className='text-gray-800 mt-4'>Hotel Name</p>
+          <input
+            type='text'
+            name='name'
+            value={inputs.name}
+            placeholder='Type here'
+            onChange={(e) => setInputs({ ...inputs, name: e.target.value })}
+            className='border border-gray-300 mt-1 rounded p-2 w-full'
           />
-          <p className="text-2xl font-semibold mt-6">Register Your Hotel</p>
-
-          <div className="w-full mt-4">
-            <label className="font-medium text-gray-500">Hotel Name</label>
-            <input
-              placeholder="Type here"
-              className="border border-gray-200 rounded w-full px-3 py-2.5 mt-1 outline-indigo-500 font-light"
-              type="text"
-            />
-          </div>
-
-          <div className="w-full mt-4">
-            <label className="font-medium text-gray-500">Phone</label>
-            <input
-              placeholder="Type here"
-              className="border border-gray-200 rounded w-full px-3 py-2.5 mt-1 outline-indigo-500 font-light"
-              type="text"
-            />
-          </div>
-
-          <div className="w-full mt-4">
-            <label className="font-medium text-gray-500">Address</label>
-            <textarea
-              rows="2"
-              placeholder="Type here"
-              className="border border-gray-200 rounded w-full px-3 py-2.5 mt-1 outline-indigo-500 font-light resize-none"
-            />
-          </div>
-
-          <div className="w-full mt-4 max-w-60 mr-auto">
-            <label className="font-medium text-gray-500">City</label>
-            <select
-              className="border border-gray-200 rounded w-full px-3 py-2.5 mt-1 outline-indigo-500 font-light"
-            >
-              <option value="">Select City</option>
-              {cities.map((cityName, index) => (
-                <option key={index} value={cityName}>
-                  {cityName}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <button className="bg-indigo-500 hover:bg-indigo-600 transition-all text-white mr-auto px-6 py-2 rounded cursor-pointer mt-6">
-            Register
-          </button>
         </div>
-      </form>
-    </div>
-  );
-};
 
-export default HotelReg;
+        <div className='flex-1 max-w-sm'>
+          <p className='text-gray-800 mt-4'>Contact</p>
+          <input
+            type='text'
+            name='contact'
+            value={inputs.contact}
+            placeholder='Type here'
+            onChange={(e) => setInputs({ ...inputs, contact: e.target.value })}
+            className='border border-gray-300 mt-1 rounded p-2 w-full'
+          />
+        </div>
+      </div>
+
+      <div className='max-w-2xl mt-4'>
+        <p className='text-gray-800'>Address</p>
+        <textarea
+          name='address'
+          value={inputs.address}
+          placeholder='Type here'
+          rows={3}
+          onChange={(e) => setInputs({ ...inputs, address: e.target.value })}
+          className='border border-gray-300 mt-1 rounded p-2 w-full resize-none'
+        />
+      </div>
+
+      <div className='max-w-xs mt-4'>
+        <p className='text-gray-800'>City</p>
+        <select
+          name='city'
+          value={inputs.city}
+          onChange={(e) => setInputs({ ...inputs, city: e.target.value })}
+          className='border border-gray-300 mt-1 rounded p-2 w-full'
+        >
+          <option value=''>Select City</option>
+          {cities.map((cityName, index) => (
+            <option key={index} value={cityName}>
+              {cityName}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <button
+        className='bg-primary text-white px-8 py-2 rounded mt-8 cursor-pointer'
+        disabled={loading}
+      >
+        {loading ? 'Registering...' : 'Register Hotel'}
+      </button>
+    </form>
+  )
+}
+
+export default AddHotel

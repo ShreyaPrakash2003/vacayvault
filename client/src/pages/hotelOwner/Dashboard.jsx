@@ -1,72 +1,113 @@
-import React from 'react';
-import { assets } from '../../assets/assets';
+import React, { useEffect, useState } from 'react'
+import { assets } from '../../assets/assets'
 import Title from '../../components/Title';
+import axios from 'axios';
+import { toast } from 'react-hot-toast';
+// import { UserData } from '../../context/AppProvider';
 
 const Dashboard = () => {
-    return (
-        <div>
-            <Title
-                align='left'
-                font='outfit'
-                title='Dashboard'
-                subTitle='Monitor your room listings, track bookings and analyze revenue—all in one place.'
-            />
+//   const { user, } = UserData();
+  const currency = '₹'; // Hardcoded currency for INR, or fetch from context if needed
 
-            <div className='flex gap-4 my-8'>
-                <div className='bg-primary/3 border border-primary/10 rounded flex p-4 pr-8'>
-                    <img className='max-sm:hidden h-10' src={assets.totalBookingIcon} alt="" />
-                    <div className='flex flex-col sm:ml-4 font-medium'>
-                        <p className='text-blue-500 text-lg'>Total Bookings</p>
-                        <p className='text-neutral-400 text-base'>123</p>
-                    </div>
-                </div>
-                <div className='bg-primary/3 border border-primary/10 rounded flex p-4 pr-8'>
-                    <img className='max-sm:hidden h-10' src={assets.totalRevenueIcon} alt="" />
-                    <div className='flex flex-col sm:ml-4 font-medium'>
-                        <p className='text-blue-500 text-lg'>Total Revenue</p>
-                        <p className='text-neutral-400 text-base'>₹99,000</p>
-                    </div>
-                </div>
-            </div>
+  const [dashboardData, setDashboardData] = useState({
+    bookings: [],
+    totalBookings: 0,
+    totalRevenue: 0,
+  });
 
-            <h2 className='text-xl text-blue-950/70 font-medium mb-5'>Recent Bookings</h2>
+  const fetchDashboardData = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const { data } = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/bookings/hotel`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+     console.log(data);
+      if (data.success) {
+        setDashboardData(data.dashboardData);
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      toast.error(error.message);
+    }
+  };
 
-            <div className='w-full max-w-3xl text-left border border-gray-300 rounded-lg max-h-80 overflow-y-scroll'>
-                <table className='w-full'>
-                    <thead className='bg-gray-50'>
-                        <tr>
-                            <th className='py-3 px-4 text-gray-800 font-medium'>User Name</th>
-                            <th className='py-3 px-4 text-gray-800 font-medium max-sm:hidden'>Room Name</th>
-                            <th className='py-3 px-4 text-gray-800 font-medium text-center'>Total Amount</th>
-                            <th className='py-3 px-4 text-gray-800 font-medium text-center'>Payment Status</th>
-                        </tr>
-                    </thead>
-                    <tbody className='text-sm'>
-                        <tr>
-                            <td className='py-3 px-4 text-gray-700 border-t border-gray-300'>John Doe</td>
-                            <td className='py-3 px-4 text-gray-400 border-t border-gray-300 max-sm:hidden'>Luxury Room</td>
-                            <td className='py-3 px-4 text-gray-400 border-t border-gray-300 text-center'>₹8,000</td>
-                            <td className='py-3 px-4 border-t border-gray-300 flex'>
-                                <button className='py-1 px-3 text-xs rounded-full mx-auto bg-green-200 text-green-600'>
-                                    Completed
-                                </button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td className='py-3 px-4 text-gray-700 border-t border-gray-300'>Jane Smith</td>
-                            <td className='py-3 px-4 text-gray-400 border-t border-gray-300 max-sm:hidden'>Double Bed</td>
-                            <td className='py-3 px-4 text-gray-400 border-t border-gray-300 text-center'>₹6,500</td>
-                            <td className='py-3 px-4 border-t border-gray-300 flex'>
-                                <button className='py-1 px-3 text-xs rounded-full mx-auto bg-amber-200 text-yellow-600'>
-                                    Pending
-                                </button>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+  useEffect(() => {
+     
+      fetchDashboardData();
+    
+  }, []);
+
+  return (
+    <div>
+      <Title
+        align='left'
+        font='outfit'
+        title='Dashboard'
+        subTitle='Monitor your room listings, track bookings and analyze revenue—all in one place. Stay updated with real-time insights to ensure smooth operations.'
+      />
+      
+      <div className='flex gap-4 my-8'>
+        <div className='bg-primary/3 border border-primary/10 rounded flex p-4 pr-8'>
+          <img className='max-sm:hidden h-10' src={assets.totalBookingIcon} alt="Total Bookings" />
+          <div className='flex flex-col sm:ml-4 font-medium'>
+            <p className='text-blue-500 text-lg'>Total Bookings</p>
+            <p className='text-neutral-400 text-base'>{dashboardData.totalBookings}</p>
+          </div>
         </div>
-    );
+
+        <div className='bg-primary/3 border border-primary/10 rounded flex p-4 pr-8'>
+          <img className='max-sm:hidden h-10' src={assets.totalRevenueIcon} alt="Total Revenue" />
+          <div className='flex flex-col sm:ml-4 font-medium'>
+            <p className='text-blue-500 text-lg'>Total Revenue</p>
+            <p className='text-neutral-400 text-base'>
+              {currency} {dashboardData.totalRevenue}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <h2 className='text-xl text-blue-950/70 font-medium mb-5'>Recent Bookings</h2>
+      <div className='w-full max-w-3xl text-left border border-gray-300 rounded-lg max-h-80 overflow-y-scroll'>
+        <table className='w-full'>
+          <thead className='bg-gray-50'>
+            <tr>
+              <th className='py-3 px-4 text-gray-800 font-medium'>User Name</th>
+              <th className='py-3 px-4 text-gray-800 font-medium max-sm:hidden'>Room Name</th>
+              <th className='py-3 px-4 text-gray-800 font-medium text-center'>Total Amount</th>
+              <th className='py-3 px-4 text-gray-800 font-medium text-center'>Payment Status</th>
+            </tr>
+          </thead>
+          <tbody className='text-sm'>
+            {dashboardData.bookings.map((item, index) => (
+              <tr key={index}>
+                <td className='py-3 px-4 text-gray-700 border-t border-gray-300'>
+                  {item.user?.username || 'N/A'}
+                </td>
+                <td className='py-3 px-4 text-gray-400 border-t border-gray-300 max-sm:hidden'>
+                  {item.room?.roomType || 'N/A'}
+                </td>
+                <td className='py-3 px-4 text-gray-400 border-t border-gray-300 text-center'>
+                  {currency} {item.totalPrice}
+                </td>
+                <td className='py-3 px-4 border-t border-gray-300'>
+                  <button
+                    className={`py-1 px-3 text-xs rounded-full mx-auto ${
+                      item.isPaid
+                        ? 'bg-green-200 text-green-600'
+                        : 'bg-amber-200 text-yellow-600'
+                    }`}
+                  >
+                    {item.isPaid ? 'Completed' : 'Pending'}
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
 };
 
 export default Dashboard;

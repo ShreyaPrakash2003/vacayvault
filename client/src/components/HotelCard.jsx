@@ -2,21 +2,11 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { assets } from '../assets/assets';
 
-const HotelCard = () => {
+const HotelCard = ({room}) => {
+
   const currency = "₹";
 
-  // Dummy data
-  const room = {
-    _id: "dummy123",
-    images: [assets.defaultRoomImage || assets.uploadArea],
-    pricePerNight: 1200,
-    hotel: {
-      name: "Tranquil Stay",
-      address: "MG Road, Bangalore"
-    }
-  };
-
-  const index = Math.floor(Math.random() * 10); // Random index for Best Seller tag
+  const index = Math.floor(Math.random() * 6); // Random index for Best Seller tag
 
   return (
     <Link
