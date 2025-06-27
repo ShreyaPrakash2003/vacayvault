@@ -63,7 +63,7 @@ export const createBooking = async (req, res) => {
     });
    // Send confirmation email
     const emailData = {
-      username: req.user.username,
+      username: req.user.email,
       bookingId: booking.id,
       hotelName: roomData.hotel.name,
       hotelAddress: roomData.hotel.address,
