@@ -2,6 +2,8 @@ import Booking from "../models/Booking.js";
 import Hotel from "../models/Hotel.js";
 import Room from "../models/Room.js";
 import sendMail from "../utils/sendmail.js";
+import Razorpay from 'razorpay';
+import crypto from 'crypto';
 // import transporter from "../configs/nodemailer.js";
 
 // Helper: Check room availability
@@ -107,5 +109,101 @@ export const getHotelBookings = async (req, res) => {
     res.json({ success: true, dashboardData: { totalBookings, totalRevenue, bookings } });
   } catch (error) {
     res.json({ success: false, message: "Failed to fetch bookings" });
+  }
+};
+
+//POST /api/bookings/razor-pay
+
+export const getChecking = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { bookingId } = req.body;
+
+    if (!bookingId) {
+      return res.status(400).json({ success: false, message: 'Booking ID is required' });
+    }
+
+    const booking = await Booking.findById(bookingId).populate('room').populate('hotel');
+    console.log(booking);
+
+    if (!booking ) {
+      return res.status(404).json({ success: false, message: 'Booking not found or unauthorized' });
+    }
+
+    const razorpay = new Razorpay({
+      key_id: process.env.Razorpay_key,
+      key_secret: process.env.Razorpay_secret,
+    });
+
+    const options = {
+      amount: booking.totalPrice * 100, // amount in paise
+      currency: 'INR',
+      receipt: bookingId,
+    };
+
+    const order = await razorpay.orders.create(options);
+
+    res.status(200).json({
+      success: true,
+      order,
+    });
+
+  } catch (error) {
+    console.error('Razorpay Order Error:', error);
+    res.status(500).json({ success: false, message: 'Razorpay order creation failed', error: error.message });
+  }
+};
+
+export const getVerify = async (req, res) => {
+  try {
+    const {
+      bookingId,
+      razorpay_order_id,
+      razorpay_payment_id,
+      razorpay_signature,
+    } = req.body;
+    
+console.log('Booking ID received:', bookingId);
+    const expectedSignature = crypto
+      .createHmac('sha256', process.env.Razorpay_secret)
+      .update(`${razorpay_order_id}|${razorpay_payment_id}`)
+      .digest('hex');
+
+    if (expectedSignature !== razorpay_signature) {
+      return res.status(400).json({
+        success: false,
+        message: 'Payment signature verification failed',
+      });
+    }
+
+
+const booking = await Booking.findByIdAndUpdate(
+  bookingId,
+  { isPaid: true },
+  { new: true }
+);
+console.log(booking.isPaid);
+
+
+
+    if (!booking) {
+      return res.status(404).json({
+        success: false,
+        message: 'Booking not found after payment',
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Payment verified and booking updated',
+      booking,
+    });
+  } catch (error) {
+    console.error('Payment verification failed:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error',
+      error: error.message,
+    });
   }
 };

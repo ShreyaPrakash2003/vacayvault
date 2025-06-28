@@ -4,8 +4,10 @@ import { assets } from '../assets/assets';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { UserData } from '../context/AppProvider';
+import { useNavigate } from 'react-router-dom';
 
 const MyBookings = () => {
+  const navigate= useNavigate();
   const { user } = UserData(); // Only user from context
   const [bookings, setBookings] = useState([]);
 
@@ -31,9 +33,86 @@ const MyBookings = () => {
     }
   };
 
+
+const handlePayment = async (booking) => {
+  try {
+    // 1. Create Razorpay Order from backend
+    const { data } = await axios.post(
+      `${import.meta.env.VITE_BACKEND_URL}/api/bookings/razorpay-payment`,
+      { bookingId: booking._id }, // in paise
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+      }
+    );
+
+    if (!data.success) {
+      toast.error('Payment order creation failed');
+      return;
+    }
+    console.log(data.order.amount,data.order.id)
+   
+    const options = {
+      key: import.meta.env.VITE_Razorpay_key,
+      amount: data.order.amount,
+      currency: data.order.currency,
+      name: 'Hotel-Booking',
+      description: 'Thanks for payment',
+      order_id: data.order.id,
+
+      handler: async function (response) {
+        const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = response;
+
+        try {
+          // 2. Verify payment with backend
+          const verifyRes = await axios.post(
+            `${import.meta.env.VITE_BACKEND_URL}/api/bookings/verify-payment`,
+            {
+              bookingId: booking._id,
+              razorpay_order_id,
+              razorpay_payment_id,
+              razorpay_signature,
+            },
+            {
+              headers: {
+                Authorization: `Bearer ${localStorage.getItem('token')}`,
+              },
+            }
+          );
+
+          toast.success(verifyRes.data.message || 'Payment Verified');
+          navigate("/");
+        } catch (error) {
+          toast.error(error?.response?.data?.message || 'Verification failed');
+        }
+      },
+
+      prefill: {
+        name: booking.user?.username || 'Guest',
+        email: booking.user?.email || 'guest@example.com',
+      },
+
+      theme: {
+        color: '#3b82f6',
+      },
+    };
+
+    const razorpay = new window.Razorpay(options);
+    razorpay.open();
+  } catch (error) {
+    toast.error(error?.response?.data?.message || 'Order creation failed');
+  }
+};
+
+
+
+
+    
   useEffect(() => {
     if (user) fetchUserBookings();
   }, [user]);
+
 
   return (
     <div className="py-28 md:pb-35 md:pt-32 px-4 md:px-16 lg:px-24 xl:px-32">
@@ -122,6 +201,11 @@ const MyBookings = () => {
               {booking.isPaid ? 'Paid' : 'Unpaid'}
             </p>
           </div>
+            {!booking.isPaid && (
+         <button onClick={()=> handlePayment(booking)} className="px-4 py-1.5 mt-4 text-xs border border-gray-400 rounded-full hover:bg-gray-50 transition-all cursor-pointer">
+             Pay Now
+         </button>
+             )}
         </div>
       ))}
     </div>

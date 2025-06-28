@@ -65,19 +65,34 @@ const Navbar = () => {
       <div className="hidden md:flex items-center gap-4">
         <img src={assets.searchIcon} alt="search" className={`${isScrolled && "invert"} h-7 transition-all duration-500`} />
         {isLoggedIn ? (
-          <button
+        <> <button
             onClick={() => navigate("/my-bookings")}
             className="text-sm px-4 py-2 border rounded-full hover:bg-gray-100"
           >
             My Bookings
           </button>
+            <button
+  onClick={() => {
+    localStorage.removeItem('token'); // remove token
+    navigate('/login'); // go to login
+  }}
+  className="text-sm px-4 py-2 border rounded-full hover:bg-gray-100"
+>
+  Log Out
+</button></> 
         ) : (
-          <button
+          <><button
             onClick={() => navigate("/login")}
             className="bg-black text-white px-8 py-2.5 rounded-full ml-4 transition-all duration-500"
           >
             Login
           </button>
+           <button
+            onClick={() => navigate("/register")}
+            className="bg-black text-white px-8 py-2.5 rounded-full ml-4 transition-all duration-500"
+          >
+            Register
+          </button></>
         )}
       </div>
 

@@ -16,7 +16,10 @@ connectCloudinary();
 const PORT = process.env.PORT || 8080;
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: process.env.FRONTEND_URL,
+  
+}));
 app.use(morgan('dev'));
 app.use(cookieParser());
 app.use(express.json());
