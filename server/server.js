@@ -13,7 +13,7 @@ const app = express();
 dotenv.config();
 connectDB();
 connectCloudinary();
-const PORT = process.env.PORT || 8080;
+const PORT = process.env.PORT || 8081;
 
 // Middleware
 app.use(cors({
@@ -27,6 +27,9 @@ app.use(express.json());
 // Routes
 app.get('/', (req, res) => {
   res.send('Hello from Express Server!');
+});
+app.get('/test', (req, res) => {
+  res.send('Logging test route');
 });
 app.use("/api/user", userRouter);
 app.use("/api/hotels", hotelRouter);
