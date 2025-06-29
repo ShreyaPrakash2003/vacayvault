@@ -44,7 +44,6 @@ export const UserContextProvider = ({ children }) => {
         Authorization: `Bearer ${token}`,
       },
     });
-    console.log(data.user);
     setUser(data.user); // Valid user
   } catch (error) {
     console.log("Token invalid or expired");
@@ -62,8 +61,7 @@ export const UserContextProvider = ({ children }) => {
     if (data.success) {
       toast.success("Login successful!");
       localStorage.setItem("token", data.token);        // Save token
-      setUser(data.user); 
-      console.log(user)                              // Set user state
+      setUser(data.user);                               // Set user state
       navigate("/");                                     // Redirect
     } else {
       toast.error(data.message || "Login failed");

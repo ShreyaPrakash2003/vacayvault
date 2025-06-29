@@ -101,47 +101,85 @@ const Navbar = () => {
         <img onClick={() => setIsMenuOpen(!isMenuOpen)} src={assets.menuIcon} alt="menu" className={`${isScrolled && "invert"} h-4 cursor-pointer`} />
       </div>
 
+     
       {/* Mobile Sidebar */}
-      <div className={`fixed top-0 left-0 w-full h-screen bg-white flex flex-col md:hidden items-center justify-center gap-6 text-gray-800 transition-all duration-500 ${isMenuOpen ? "translate-x-0" : "-translate-x-full"}`}>
-        <button className="absolute top-4 right-4" onClick={() => setIsMenuOpen(false)}>
-          <img src={assets.closeMenu} alt="close-menu" className="h-6.5" />
-        </button>
+<div className={`fixed top-0 left-0 w-full h-screen bg-white flex flex-col md:hidden items-center justify-center gap-6 text-gray-800 transition-all duration-500 ${isMenuOpen ? "translate-x-0" : "-translate-x-full"}`}>
+  <button className="absolute top-4 right-4" onClick={() => setIsMenuOpen(false)}>
+    <img src={assets.closeMenu} alt="close-menu" className="h-6.5" />
+  </button>
 
-        {navLinks.map((navLink) => (
-          <NavLink key={navLink.name} to={navLink.path} onClick={() => setIsMenuOpen(false)}>
-            {navLink.name}
-          </NavLink>
-        ))}
+  {navLinks.map((navLink) => (
+    <NavLink
+      key={navLink.name}
+      to={navLink.path}
+      className="text-lg"
+      onClick={() => {
+        scrollTo(0, 0);
+        setIsMenuOpen(false);
+      }}
+    >
+      {navLink.name}
+    </NavLink>
+  ))}
 
-        {isLoggedIn && (
-          <>
-            <NavLink to="/my-bookings" onClick={() => setIsMenuOpen(false)}>
-              My Bookings
-            </NavLink>
-            <button
-              className="border px-4 py-1 text-sm font-light rounded-full"
-              onClick={() => {
-                setIsMenuOpen(false);
-                navigate("/owner");
-              }}
-            >
-              Dashboard
-            </button>
-          </>
-        )}
+  {isLoggedIn ? (
+    <>
+      <button
+        onClick={() => {
+          setIsMenuOpen(false);
+          navigate("/my-bookings");
+        }}
+        className="px-6 py-2 text-sm border rounded-full hover:bg-gray-100 transition"
+      >
+        My Bookings
+      </button>
 
-        {!isLoggedIn && (
-          <button
-            onClick={() => {
-              setIsMenuOpen(false);
-              navigate("/login");
-            }}
-            className="bg-black text-white px-8 py-2.5 rounded-full"
-          >
-            Login
-          </button>
-        )}
-      </div>
+      <button
+        onClick={() => {
+          setIsMenuOpen(false);
+          navigate("/owner");
+        }}
+        className="px-6 py-2 text-sm border rounded-full hover:bg-gray-100 transition"
+      >
+        Dashboard
+      </button>
+
+      <button
+        onClick={() => {
+          localStorage.removeItem("token");
+          setIsMenuOpen(false);
+          navigate("/login");
+        }}
+        className="px-6 py-2 text-sm border rounded-full hover:bg-gray-100 transition"
+      >
+        Log Out
+      </button>
+    </>
+  ) : (
+    <>
+      <button
+        onClick={() => {
+          setIsMenuOpen(false);
+          navigate("/login");
+        }}
+        className="bg-black text-white px-8 py-2.5 rounded-full"
+      >
+        Login
+      </button>
+
+      <button
+        onClick={() => {
+          setIsMenuOpen(false);
+          navigate("/register");
+        }}
+        className="bg-black text-white px-8 py-2.5 rounded-full"
+      >
+        Register
+      </button>
+    </>
+  )}
+</div>
+
     </nav>
   );
 };

@@ -1,9 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { UserData } from '../context/AppProvider';
-
+import {
+  FaUser,
+  FaLock,
+  FaEnvelope,
+  FaRegBuilding,
+  FaEye,
+  FaEyeSlash,
+} from 'react-icons/fa';
 
 const RegisterForm = () => {
-    const {register}= UserData();
+  const { register } = UserData();
+
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -11,79 +19,108 @@ const RegisterForm = () => {
     isHotelOwner: false,
   });
 
+  const [showPassword, setShowPassword] = useState(false);
+
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value
+      [name]: type === 'checkbox' ? checked : value,
     }));
   };
 
- const handleSubmit = (e) => {
-  e.preventDefault();
-  console.log("Form Data Submitted:", formData);
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    register({
+      name: formData.name,
+      email: formData.email,
+      password: formData.password,
+      role: formData.isHotelOwner ? 'hotelOwner' : 'user',
+    });
+  };
 
-  register({
-    name: formData.name,
-    email: formData.email,
-    password: formData.password,
-    role: formData.isHotelOwner ? 'hotelOwner' : 'user'
-  });
-};
-
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   return (
-    <div className="max-w-md mx-auto mt-10 p-6 bg-white rounded-xl shadow-md">
-      <h2 className="text-2xl font-semibold text-gray-800 mb-6 text-center">Register</h2>
-      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-        <input
-          type="text"
-          name="name"
-          placeholder="Username"
-          value={formData.name}
-          onChange={handleChange}
-          className="border px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          required
-        />
+    <div className="min-h-screen pt-28 flex items-center justify-center px-4 bg-white">
+      <div className="w-full max-w-md bg-white p-8 rounded-2xl shadow-xl border border-gray-200 transition-all">
+        <h2 className="text-3xl font-bold text-center text-gray-800 mb-6">
+          Create Your Account
+        </h2>
 
-        <input
-          type="email"
-          name="email"
-          placeholder="Email"
-          value={formData.email}
-          onChange={handleChange}
-          className="border px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          required
-        />
+        <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+          {/* Name */}
+          <div className="relative">
+            <FaUser className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+            <input
+              type="text"
+              name="name"
+              placeholder="Full Name"
+              value={formData.name}
+              onChange={handleChange}
+              className="w-full border border-gray-300 pl-10 pr-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 hover:border-blue-400 transition"
+              required
+            />
+          </div>
 
-        <input
-          type="password"
-          name="password"
-          placeholder="Password"
-          value={formData.password}
-          onChange={handleChange}
-          className="border px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          required
-        />
+          {/* Email */}
+          <div className="relative">
+            <FaEnvelope className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+            <input
+              type="email"
+              name="email"
+              placeholder="Email Address"
+              value={formData.email}
+              onChange={handleChange}
+              className="w-full border border-gray-300 pl-10 pr-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 hover:border-blue-400 transition"
+              required
+            />
+          </div>
 
-        <label className="inline-flex items-center">
-          <input
-            type="checkbox"
-            name="isHotelOwner"
-            checked={formData.isHotelOwner}
-            onChange={handleChange}
-            className="mr-2"
-          />
-          Are you a <span className="font-semibold ml-1">Hotel Owner?</span>
-        </label>
+          {/* Password */}
+          <div className="relative">
+            <FaLock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+            <input
+              type={showPassword ? 'text' : 'password'}
+              name="password"
+              placeholder="Password"
+              value={formData.password}
+              onChange={handleChange}
+              className="w-full border border-gray-300 pl-10 pr-10 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 hover:border-blue-400 transition"
+              required
+            />
+            <span
+              onClick={() => setShowPassword((prev) => !prev)}
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 cursor-pointer"
+            >
+              {showPassword ? <FaEyeSlash /> : <FaEye />}
+            </span>
+          </div>
 
-        <button
-          type="submit"
-          className="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition-all"
-        >
-          Register
-        </button>
-      </form>
+          {/* Hotel Owner */}
+          <label className="flex items-center text-gray-700 text-sm cursor-pointer">
+            <input
+              type="checkbox"
+              name="isHotelOwner"
+              checked={formData.isHotelOwner}
+              onChange={handleChange}
+              className="mr-2 accent-blue-600 w-4 h-4"
+            />
+            <FaRegBuilding className="mr-2 text-gray-500" />
+            I am a <span className="font-semibold ml-1">Hotel Owner</span>
+          </label>
+
+          {/* Submit */}
+          <button
+            type="submit"
+            className="bg-blue-600 text-white py-2 rounded-md text-lg shadow-md hover:bg-blue-700 hover:scale-[1.03] transition-transform duration-300"
+          >
+            Register
+          </button>
+        </form>
+      </div>
     </div>
   );
 };
