@@ -3,7 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import StarRating from '../components/StarRating';
 import { UserData } from '../context/AppProvider';
 import { assets } from '../assets/assets.js';
-import ChatPopup from '../components/Chatpopup.jsx';
+import Chatbot from '../components/Chatbot.jsx';
 
 
 // Local amenities-to-icon map
@@ -215,7 +215,7 @@ const AllRooms = () => {
           </div>
         </div>
       </div>
-      <ChatPopup/>
+      <Chatbot/>
     </div>
   );
 };
