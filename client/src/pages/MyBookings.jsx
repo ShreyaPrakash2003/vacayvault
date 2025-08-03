@@ -5,6 +5,7 @@ import axios from 'axios';
 import toast from 'react-hot-toast';
 import { UserData } from '../context/AppProvider';
 import { useNavigate } from 'react-router-dom';
+import ChatBotPopup from '../components/Chatpopup';
 
 const MyBookings = () => {
   const navigate= useNavigate();
@@ -210,6 +211,7 @@ const handlePayment = async (booking) => {
       ))}
     </div>
       </div>
+      <ChatBotPopup/>
     </div>
   );
 };

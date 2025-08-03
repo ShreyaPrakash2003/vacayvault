@@ -5,6 +5,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import StarRating from '../components/StarRating';
+import ChatBotPopup from '../components/Chatpopup';
 
 // Local amenities-to-icon map
 const facilityIcons = {
@@ -199,6 +200,7 @@ const RoomDetails = () => {
           Contact Now
         </button>
       </div>
+      <ChatBotPopup/>
     </div>
   );
 };
