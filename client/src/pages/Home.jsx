@@ -5,7 +5,8 @@ import ExclusiveOffers from '../components/ExclusiveOffers'
 import  Testimonial from '../components/Testimonial'
 import NewsLetter from '../components/NewsLetter'
 import RecommendedHotels from '../components/RecommendedHotels'
-import ChatBotPopup from '../components/Chatpopup'
+import ChatPopup from '../components/Chatpopup'
+
 
 
 const Home = () => {
@@ -19,7 +20,7 @@ const Home = () => {
             <ExclusiveOffers />
             <Testimonial />
             <NewsLetter/>
-            <ChatBotPopup/>
+            <ChatPopup/>
         </>
     )
 }

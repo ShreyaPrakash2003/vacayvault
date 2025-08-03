@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import axios from 'axios';
 import chatbotMeow from '../assets/chatbotmeow.jpg';
 
-const ChatBotPopup = () => {
+const ChatPopup = () => {
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState([]);
   const [userInput, setUserInput] = useState('');
@@ -100,4 +100,4 @@ const ChatBotPopup = () => {
   );
 };
 
-export default ChatBotPopup;
+export default ChatPopup;

@@ -5,7 +5,8 @@ import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import StarRating from '../components/StarRating';
-import ChatBotPopup from '../components/Chatpopup';
+import ChatPopup from '../components/Chatpopup';
+
 
 
 
@@ -202,7 +203,7 @@ const RoomDetails = () => {
           Contact Now
         </button>
       </div>
-      <ChatBotPopup/>
+      <ChatPopup/>
     </div>
   );
 };
