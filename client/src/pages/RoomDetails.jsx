@@ -7,6 +7,8 @@ import toast from 'react-hot-toast';
 import StarRating from '../components/StarRating';
 import ChatBotPopup from '../components/Chatpopup';
 
+
+
 // Local amenities-to-icon map
 const facilityIcons = {
   "Free WiFi": assets.freeWifiIcon,

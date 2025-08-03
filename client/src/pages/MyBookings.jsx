@@ -7,6 +7,7 @@ import { UserData } from '../context/AppProvider';
 import { useNavigate } from 'react-router-dom';
 import ChatBotPopup from '../components/Chatpopup';
 
+
 const MyBookings = () => {
   const navigate= useNavigate();
   const { user } = UserData(); // Only user from context
